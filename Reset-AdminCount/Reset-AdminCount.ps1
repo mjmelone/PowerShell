@@ -1,0 +1,60 @@
+###########################################################
+# Reset-AdminCount
+#
+# This script accepts an ADObject (the object returned from
+# Get-ADUser, Get-ADObject, etc.) and resets the adminCount
+# attribute as well as reenables inheritance of permissions
+# to make it act as if it were any other account
+###########################################################
+
+Function Reset-AdminCount {
+    param(
+        [parameter(mandatory=$True)]
+        [Microsoft.ActiveDirectory.Management.ADObject[]]
+        $ADObject
+    )
+    $strDN = $ADObject.DistinguishedName
+    if (-not $strDN) {
+        Write-Error "ADObject is missing the distinguishedName attribute.  Skipping."
+        Return
+    }
+    try {
+        Set-ADObject -Identity $strDN -Clear adminCount
+    } catch {
+        Write-Error "Failed to clear the adminCount attribute of the ADObject."
+        Return
+    }
+
+    try {
+        $adoCurrent = [adsi] "ldap://$strDN"
+        $aclADObject = $adoCurrent.ObjectSecurity
+        if ($aclADObject.AreAccessRulesProtected) {
+            $aclADObject.SetAccessRuleProtection($false,$true)
+            $adoCurrent.CommitChanges()
+        }
+    } catch {
+        Write-Error "An error occurred while trying to commit ACL changes to the ADObject."
+    }
+}
+
+# This Sample Code is provided for the purpose of illustration only and is not intended to be used 
+# in a production environment. THIS SAMPLE CODE AND ANY RELATED INFORMATION ARE PROVIDED "AS IS" 
+# WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED 
+# WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE. We grant You a nonexclusive, 
+# royalty-free right to use and modify the Sample Code and to reproduce and distribute the object code 
+# form of the Sample Code, provided that You agree: (i) to not use Our name, logo, or trademarks to 
+# market Your software product in which the Sample Code is embedded; (ii) to include a valid copyright 
+# notice on Your software product in which the Sample Code is embedded; and (iii) to indemnify, hold 
+# harmless, and defend Us and Our suppliers from and against any claims or lawsuits, including attorneys’ 
+# fees, that arise or result from the use or distribution of the Sample Code.
+
+# This sample script is not supported under any Microsoft standard support program or service. 
+# The sample script is provided AS IS without warranty of any kind. Microsoft further disclaims 
+# all implied warranties including, without limitation, any implied warranties of merchantability 
+# or of fitness for a particular purpose. The entire risk arising out of the use or performance of 
+# the sample scripts and documentation remains with you. In no event shall Microsoft, its authors, 
+# or anyone else involved in the creation, production, or delivery of the scripts be liable for any 
+# damages whatsoever (including, without limitation, damages for loss of business profits, business 
+# interruption, loss of business information, or other pecuniary loss) arising out of the use of or 
+# inability to use the sample scripts or documentation, even if Microsoft has been advised of the 
+# possibility of such damages 
