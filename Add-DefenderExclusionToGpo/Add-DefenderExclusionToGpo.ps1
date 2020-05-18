@@ -63,8 +63,14 @@ function Add-DefenderExclusionToGpo
             # Set the registry key
             $KeyName = 'HKLM\Software\Policies\Microsoft\Windows Defender\Exclusions\Processes'
         }
-        Default {}
+        Default {
+            Write-Error "Invalid option for ExclusionType: $ExclusionType"
+        }
     }
 
-    Set-GPRegistryValue -Guid $Gpo.id -Key $KeyName -ValueName $Exclusion -Type String -Value "0" | Out-Null
+    try {
+        Set-GPRegistryValue -Guid $Gpo.id -Key $KeyName -ValueName $Exclusion -Type String -Value "0" | Out-Null
+    } catch {
+        throw "Add-DefenderExclusionToGpo: Failed to add the exclusion to the GPO.  Please ensure you have permissions to edit the policy and that Active Directory is functioning normally."
+    }
 }
