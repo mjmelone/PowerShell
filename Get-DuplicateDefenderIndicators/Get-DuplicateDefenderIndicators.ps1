@@ -1,5 +1,5 @@
 # Enter your tenant ID, Client ID, and Client Secret below.
-# Script requires TI.ReadWrite and TI.ReadWrite.All 
+# Script requires WindowsDefenderATP\TI.ReadWrite.All API permissions
 $tenant = '' # Set this to your AAD Tenant ID
 $ClientId = '' # Set this to an app identity with the following API permission: WindowsDefenderATP\TI.ReadWrite.All
 $ClientSecret = '' # Set this to your client secret for the account
