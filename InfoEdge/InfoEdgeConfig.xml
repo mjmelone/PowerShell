@@ -1,0 +1,33 @@
+<config>
+    <registry enable="True">
+        <regvalue hive="HKLM" key="SOFTWARE\Microsoft\Windows\CurrentVersion\Run" getallvalues="True"/>
+        <regvalue hive="HKLM" key="SYSTEM\CurrentControlSet\Control\CloudDomainJoin\JoinInfo" property="TenantId"/>
+        <regvalue hive="HKLM" key="SYSTEM\CurrentControlSet\Control\Terminal Server" property="fDenyTSConnections"/>
+        <regvalue hive="HKLM" key="SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" property="SecurityLayer"/>
+        <regvalue hive="HKLM" key="SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest" property="UseLogonCredential"/>
+        <regvalue hive="HKLM" key="System\CurrentControlSet\Control\Lsa\OSConfig" property="Security Packages"/>
+        <!-- Collect firewall rules - ref: https://msdn.microsoft.com/en-us/library/ff719844.aspx for firewall rule parsing -->
+        <regvalue hive="HKLM" key="SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\FirewallRules\" getallvalues="True"/>
+        <regvalue hive="HKU" key="Software\Sysinternals" getallchildkeys="True"/>
+    </registry>
+    <wmi enable="True">
+        <wmiquery query="select * from Win32_OperatingSystem"/>
+        <wmiquery namespace="root\securitycenter2" query="SELECT * FROM AntiVirusProduct"/>
+        <wmiquery query="select * from Win32_UserProfile"/>
+        <wmiquery query="select * from  Win32_ComputerSystem"/>
+        <wmiquery query="select * from Win32_Group" invokemethod="Members"/>
+    </wmi>
+    <events enable="True" limit="100">
+        <eventquery logname="Security" eventid="1102"/>
+        <eventquery logname="System" eventid="104"/>
+        <eventquery logname="System" eventid="7045"/>
+        <eventquery logname="System" eventid="7009"/>
+    </events>
+    <secpol enable="True"/>
+    <msert enable="False" cleanmalware="False"/>
+    <updates enable="True"/>
+    <winrm enable="True"/>
+    <localgroups enable="True"/>
+    <localusers enable="True"/>
+    <scheduledtasks enable="True"/>
+</config>
